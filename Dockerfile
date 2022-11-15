@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y unzip xmlstarlet \
 
 ARG BUST_CACHE=1
 RUN \
+    useradd -u 76271 otndc && \
+    groupmod -g 76271 tomcat && \
+    echo "otndc ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     curl -fSL "${ERDDAP_CONTENT_URL}" -o /erddapContent.zip && \
     unzip /erddapContent.zip -d ${CATALINA_HOME} && \
     rm /erddapContent.zip && \
@@ -54,6 +57,7 @@ ENV ERDDAP_baseHttpsUrl="https://localhost:8443" \
     ERDDAP_adminEmail="nobody@example.com"
 
 COPY entrypoint.sh datasets.d.sh /
+USER otndc
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 8080
